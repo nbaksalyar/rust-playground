@@ -1,0 +1,24 @@
+on:
+  # Trigger the workflow on push or pull request,
+  # but only for the master branch
+  push:
+  pull_request:
+
+jobs:
+  build_stable:
+    name: "Build stable compiler container"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+      - name: "Build and push container"
+        uses: docker/build-push-action@v1
+          with:
+            username: ${{ secrets.QUAY_IO_USERNAME }}
+            password: ${{ secrets.QUAY_IO_PASSWORD }}
+            registry: quay.io
+            repository: shepmaster/rust-playground-ci
+            tags: ${{ env.GITHUB_RUN_ID }}
+            path: compiler/base/
+            build_args: channel=stable
+            cache_froms: quay.io/shepmaster/rust-playground-ci:latest
