@@ -1,16 +1,16 @@
-on:
-  # Trigger the workflow on push or pull request,
-  # but only for the master branch
-  push:
-  pull_request:
+name: "Validate everything"
+
+on: [push, pull_request]
 
 jobs:
   build_stable:
     name: "Build stable compiler container"
     runs-on: ubuntu-latest
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v2
+
       - name: "Build and push container"
         uses: docker/build-push-action@v1
           with:
