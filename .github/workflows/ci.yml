@@ -8,6 +8,9 @@ on:
     branches:
       - master
 
+env:
+  QUAY_IO_USERNAME: shepmaster
+
 jobs:
   build_stable:
     name: "Build stable compiler container"
