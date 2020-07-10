@@ -23,7 +23,7 @@ jobs:
       - name: "Build and push container"
         uses: docker/build-push-action@v1
         with:
-          username: ${{ secrets.QUAY_IO_USERNAME }}
+          username: ${{ env.QUAY_IO_USERNAME }}
           password: ${{ secrets.QUAY_IO_PASSWORD }}
           registry: quay.io
           repository: shepmaster/rust-playground-ci
