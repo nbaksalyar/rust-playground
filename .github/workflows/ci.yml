@@ -37,3 +37,7 @@ jobs:
           always_pull: true
           cache_froms: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:${{ github.run_id }},shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:latest
           labels: quay.expires-after=1w
+
+# always_pull -- not working
+# labels -- not working
+# `latest` tag -- not working
