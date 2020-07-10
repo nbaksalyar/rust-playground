@@ -24,7 +24,7 @@ jobs:
           password: ${{ secrets.QUAY_IO_PASSWORD }}
           registry: quay.io
           repository: shepmaster/rust-playground-ci
-          tags: ${{ env.GITHUB_RUN_ID }}
+          tags: $GITHUB_RUN_ID
           path: compiler/base/
           build_args: channel=stable
           cache_froms: quay.io/shepmaster/rust-playground-ci:latest
