@@ -12,9 +12,13 @@ env:
   QUAY_IO_USERNAME: shepmaster
 
 jobs:
-  build_stable:
-    name: "Build stable compiler container"
+  build_compiler_containers:
+    name: "Build ${{ matrix.channel }} compiler container"
     runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        channel: [stable, beta, nightly]
 
     steps:
       - name: "Checkout code"
@@ -26,8 +30,9 @@ jobs:
           username: ${{ env.QUAY_IO_USERNAME }}
           password: ${{ secrets.QUAY_IO_PASSWORD }}
           registry: quay.io
-          repository: shepmaster/rust-playground-ci
+          repository: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}
           tags: ${{ github.run_id }}
           path: compiler/base/
-          build_args: channel=stable
-          cache_froms: quay.io/shepmaster/rust-playground-ci:latest
+          build_args: channel=${{ matrix.channel }}
+          always_pull: true
+          cache_froms: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:latest
