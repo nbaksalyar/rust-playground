@@ -70,26 +70,30 @@ jobs:
           labels: quay.expires-after=1w
 
   build_backend:
-    - name: "Checkout code"
-      uses: actions/checkout@v2
+    name: "Build backend"
+    runs-on: ubuntu-latest
 
-    - name: "Cache Cargo artifacts"
-      uses: actions/cache@v2
-      with:
-        path: |
-          ~/.cargo/registry
-          ~/.cargo/git
-          target
-        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
 
-    - name: "Build backend"
-      container:
-        image: ekidd/rust-musl-builder:stable
-        volumes:
-          - ui:/ui
-          - target:/ui/target
-          - ~/.cargo/registry:/home/rust/.cargo/registry
-          - ~/.cargo/git:/home/rust/.cargo/git
-      run: >
-          sudo chown -R rust:rust /home/rust/.cargo /ui/target;
-          cargo build --locked --target=x86_64-unknown-linux-musl --release
+      - name: "Cache Cargo artifacts"
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+      - name: "Build backend"
+        container:
+          image: ekidd/rust-musl-builder:stable
+          volumes:
+            - ui:/ui
+            - target:/ui/target
+            - ~/.cargo/registry:/home/rust/.cargo/registry
+            - ~/.cargo/git:/home/rust/.cargo/git
+        run: >
+            sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+            cargo build --locked --target=x86_64-unknown-linux-musl --release
