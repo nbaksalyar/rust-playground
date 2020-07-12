@@ -87,8 +87,8 @@ jobs:
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: "Build backend"
-        container:
-          image: ekidd/rust-musl-builder:stable
+        uses: docker://ekidd/rust-musl-builder:stable
+        with:
           volumes:
             - ui:/ui
             - target:/ui/target
