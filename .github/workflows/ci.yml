@@ -94,6 +94,6 @@ jobs:
             - target:/ui/target
             - ~/.cargo/registry:/home/rust/.cargo/registry
             - ~/.cargo/git:/home/rust/.cargo/git
-        run: >
+          run: >
             sudo chown -R rust:rust /home/rust/.cargo /ui/target;
             cargo build --locked --target=x86_64-unknown-linux-musl --release
