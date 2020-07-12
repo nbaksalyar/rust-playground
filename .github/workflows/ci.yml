@@ -81,17 +81,23 @@ jobs:
           path: |
             ~/.cargo/registry
             ~/.cargo/git
-            target
+            ui/target
           key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
 
       - name: "Build backend"
-        uses: docker://ekidd/rust-musl-builder:stable
-        with:
-          volumes: gravyboat
-          args: >
-            bash -c ' \
-              sudo chown -R rust:rust /home/rust/.cargo /ui/target; \
-              cargo build --manifest-path=ui --locked --target=x86_64-unknown-linux-musl --release \
+        run: >-
+            docker
+            run
+            -it
+            --rm
+            -v $PWD/ui:/ui
+            -v ~/.cargo/git:/home/rust/.cargo/git
+            -v ~/.cargo/registry:/home/rust/.cargo/registry
+            --workdir /ui
+            ekidd/rust-musl-builder:stable
+            bash -c '
+              sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+              cargo build --locked --target=x86_64-unknown-linux-musl --release
             '
 
       - name: "Save backend artifact"
