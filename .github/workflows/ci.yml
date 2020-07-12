@@ -38,6 +38,58 @@ jobs:
           cache_froms: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:${{ github.run_id }},shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:latest
           labels: quay.expires-after=1w
 
-# always_pull -- not working
-# labels -- not working
-# `latest` tag -- not working
+          # always_pull -- not working
+          # labels -- not working
+          # `latest` tag -- not working
+
+  build_tool_containers:
+    name: "Build ${{ matrix.tool }} tool container"
+    runs-on: ubuntu-latest
+    needs: build_compiler_containers
+    continue-on-error: true
+
+    strategy:
+      matrix:
+        tool: [clippy, rustfmt, miri]
+
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
+
+      - name: "Build and push container"
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ env.QUAY_IO_USERNAME }}
+          password: ${{ secrets.QUAY_IO_PASSWORD }}
+          registry: quay.io
+          repository: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}
+          tags: ${{ github.run_id }},latest
+          path: compiler/${{ matrix.tool }}/
+          always_pull: true
+          cache_froms: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:${{ github.run_id }},shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:latest
+          labels: quay.expires-after=1w
+
+  build_backend:
+    - name: "Checkout code"
+      uses: actions/checkout@v2
+
+    - name: "Cache Cargo artifacts"
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.cargo/registry
+          ~/.cargo/git
+          target
+        key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+
+    - name: "Build backend"
+      container:
+        image: ekidd/rust-musl-builder:stable
+        volumes:
+          - ui:/ui
+          - target:/ui/target
+          - ~/.cargo/registry:/home/rust/.cargo/registry
+          - ~/.cargo/git:/home/rust/.cargo/git
+      run: >
+          sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+          cargo build --locked --target=x86_64-unknown-linux-musl --release
