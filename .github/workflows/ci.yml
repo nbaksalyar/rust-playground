@@ -89,9 +89,9 @@ jobs:
         with:
           volumes: gravyboat
           args: >
-            bash -c '
-              sudo chown -R rust:rust /home/rust/.cargo /ui/target;
-              cargo build --manifest-path=ui --locked --target=x86_64-unknown-linux-musl --release
+            bash -c ' \
+              sudo chown -R rust:rust /home/rust/.cargo /ui/target; \
+              cargo build --manifest-path=ui --locked --target=x86_64-unknown-linux-musl --release \
             '
 
       - name: "Save backend artifact"
