@@ -39,8 +39,6 @@ jobs:
   #         labels: quay.expires-after=1w
 
   #         # always_pull -- not working
-  #         # labels -- not working
-  #         # `latest` tag -- not working
 
   # build_tool_containers:
   #   name: "Build ${{ matrix.tool }} tool container"
@@ -91,13 +89,13 @@ jobs:
         with:
           volumes: what is this
           args: >
-            cargo build --manifest-path=ui --locked --target=x86_64-unknown-linux-musl --release
+            bash -c '
+              sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+              cargo build --manifest-path=ui --locked --target=x86_64-unknown-linux-musl --release
+            '
 
       - name: "Save backend artifact"
         uses: actions/upload-artifact@v2
         with:
           name: backend
           path: target/x86_64-unknown-linux-musl/release/ui
-
-
-#                        sudo chown -R rust:rust /home/rust/.cargo /ui/target;
