@@ -67,49 +67,92 @@ jobs:
   #         cache_froms: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:${{ github.run_id }},shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:latest
   #         labels: quay.expires-after=1w
 
-  build_backend:
-    name: "Build backend"
+  # build_backend:
+  #   name: "Build backend"
+  #   runs-on: ubuntu-latest
+
+  #   steps:
+  #     - name: "Checkout code"
+  #       uses: actions/checkout@v2
+
+  #     - name: "Cache Cargo intermediate products"
+  #       uses: actions/cache@v2
+  #       with:
+  #         path: |
+  #           ~/.cargo/registry
+  #           ~/.cargo/git
+  #           ui/target
+  #         key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}-2
+
+  #     - name: "Build backend"
+  #       run: >-
+  #           mkdir -p ui/target;
+  #           docker
+  #           run
+  #           --rm
+  #           -v $PWD/ui:/ui
+  #           -v ~/.cargo/git:/home/rust/.cargo/git
+  #           -v ~/.cargo/registry:/home/rust/.cargo/registry
+  #           --workdir /ui
+  #           ekidd/rust-musl-builder:stable
+  #           bash -c '
+  #             sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+  #             cargo build --locked --target=x86_64-unknown-linux-musl --release
+  #           '
+
+  #     - name: "Restore permissions"
+  #       run: >-
+  #         sudo chown -R runner:docker ~/.cargo/ ui/target
+
+  #     - name: "Save backend artifact"
+  #       uses: actions/upload-artifact@v2
+  #       with:
+  #         name: backend
+  #         path: ui/target/x86_64-unknown-linux-musl/release/ui
+
+  build_frontend:
+    name: "Build frontend"
     runs-on: ubuntu-latest
 
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v2
 
-      - name: "Cache Cargo intermediate products"
+      - name: "Get yarn cache directory path"
+        id: yarn-cache-dir-path
+        run: echo "::set-output name=dir::$(yarn cache dir)"
+
+      - name: "Cache yarn intermediate products"
         uses: actions/cache@v2
         with:
-          path: |
-            ~/.cargo/registry
-            ~/.cargo/git
-            ui/target
-          key: ${{ runner.os }}-cargo-${{ hashFiles('**/Cargo.lock') }}
+          path: ${{ steps.yarn-cache-dir-path.outputs.dir }}
+          key: ${{ runner.os }}-yarn-${{ hashFiles('**/yarn.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-yarn-
 
-      - name: "Build backend"
+      - name: "Configure node"
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.13
+
+      - name: "Install dependencies"
         run: >-
-            mkdir -p ui/target;
-            docker
-            run
-            --rm
-            -v $PWD/ui:/ui
-            -v ~/.cargo/git:/home/rust/.cargo/git
-            -v ~/.cargo/registry:/home/rust/.cargo/registry
-            --workdir /ui
-            ekidd/rust-musl-builder:stable
-            bash -c '
-              sudo chown -R rust:rust /home/rust/.cargo /ui/target;
-              cargo build --locked --target=x86_64-unknown-linux-musl --release
-            '
+          yarn --cwd ui/frontend/
 
-      - name: "Restore permissions"
+      - name: "Run tests"
         run: >-
-          sudo chown -R runner:docker ~/.cargo/ ui/target
+          yarn --cwd ui/frontend/ test
 
-      - name: "What it is"
+      - name: "Lint"
         run: >-
-          ls -lR ui/target
+          yarn --cwd ui/frontend/ test:lint
 
-      - name: "Save backend artifact"
+      - name: "Build frontend"
+        run: >-
+          yarn --cwd ui/frontend/ run build:production
+
+      - name: "Save frontend artifact"
         uses: actions/upload-artifact@v2
         with:
           name: backend
-          path: ui/target/x86_64-unknown-linux-musl/release/ui
+          path: ui/frontend/build
