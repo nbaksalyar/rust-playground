@@ -86,6 +86,7 @@ jobs:
 
       - name: "Build backend"
         run: >-
+            ls -la ui ui/target;
             docker
             run
             --rm
@@ -95,6 +96,7 @@ jobs:
             --workdir /ui
             ekidd/rust-musl-builder:stable
             bash -c '
+              ls -la /ui/target;
               sudo chown -R rust:rust /home/rust/.cargo /ui/target;
               cargo build --locked --target=x86_64-unknown-linux-musl --release
             '
