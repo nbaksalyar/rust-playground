@@ -99,8 +99,13 @@ jobs:
             bash -c '
               ls -la /ui/target;
               sudo chown -R rust:rust /home/rust/.cargo /ui/target;
+              ls -la /ui/target;
               cargo build --locked --target=x86_64-unknown-linux-musl --release
             '
+
+      - name: "Restore permissions"
+        run: >-
+          sudo chown -R runner:docker ~/.cargo/ ui/target
 
       - name: "Save backend artifact"
         uses: actions/upload-artifact@v2
