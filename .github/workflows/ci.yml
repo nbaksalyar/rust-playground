@@ -86,7 +86,7 @@ jobs:
 
       - name: "Build backend"
         run: >-
-            mkdir -p ui/target
+            mkdir -p ui/target;
             ls -la ui ui/target;
             docker
             run
