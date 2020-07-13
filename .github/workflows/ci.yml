@@ -183,6 +183,7 @@ jobs:
 
       - name: "Install gems"
         run: |
+          gem install bundler
           bundle config path tests/vendor/bundle
           bundle install --gemfile tests/Gemfile --jobs 4 --retry 3
 
