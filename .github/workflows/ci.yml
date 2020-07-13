@@ -189,13 +189,7 @@ jobs:
 
       - name: "Pull containers"
         run: >-
-          docker pull
-          quay.io/shepmaster/rust-playground-ci-rust-stable
-          quay.io/shepmaster/rust-playground-ci-rust-beta
-          quay.io/shepmaster/rust-playground-ci-rust-nightly
-          quay.io/shepmaster/rust-playground-ci-tool-clippy
-          quay.io/shepmaster/rust-playground-ci-tool-rustfmt
-          quay.io/shepmaster/rust-playground-ci-tool-miri
+          echo quay.io/shepmaster/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}} | xargs -n1 docker pull
 
       - uses: actions/download-artifact@v2
         with:
