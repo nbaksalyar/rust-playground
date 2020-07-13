@@ -191,15 +191,21 @@ jobs:
         run: >-
           echo quay.io/shepmaster/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}} | xargs -n1 docker pull
 
-      - uses: actions/download-artifact@v2
+      - name: "Download backend"
+        uses: actions/download-artifact@v2
         with:
           name: backend
           path: server/ui
 
-      - uses: actions/download-artifact@v2
+      - name: "Download frontend"
+        uses: actions/download-artifact@v2
         with:
           name: frontend
           path: server/built/
+
+      - name: "Inspect"
+        run: >-
+          ls -lR server
 
       - name: "Run tests"
         env:
