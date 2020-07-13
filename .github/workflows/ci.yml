@@ -217,4 +217,4 @@ jobs:
           PLAYGROUND_CORS_ENABLED: t
         run: |
           chmod +x ./server/ui && ./server/ui &
-          bundle exec rspec tests/spec
+          cd tests && bundle exec rspec
