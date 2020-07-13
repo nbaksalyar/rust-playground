@@ -183,8 +183,8 @@ jobs:
 
       - name: "Install gems"
         run: |
-          bundle config path test/vendor/bundle
-          bundle install --gemfile test/Gemfile --jobs 4 --retry 3
+          bundle config path tests/vendor/bundle
+          bundle install --gemfile tests/Gemfile --jobs 4 --retry 3
 
       - name: "Pull containers"
         run: >-
@@ -213,5 +213,5 @@ jobs:
           PLAYGROUND_CORS_ENABLED: t
         run: |
           ./server/ui &
-          bundle exec rspec test/spec
+          bundle exec rspec tests/spec
 
