@@ -164,6 +164,9 @@ jobs:
       - build_backend
       - build_frontend
 
+    env:
+      BUNDLE_GEMFILE: tests/Gemfile
+
     steps:
       - name: "Checkout code"
         uses: actions/checkout@v2
@@ -185,7 +188,7 @@ jobs:
         run: |
           gem install bundler
           bundle config path tests/vendor/bundle
-          bundle install --gemfile tests/Gemfile --jobs 4 --retry 3
+          bundle install --jobs 4 --retry 3
 
       - name: "Pull containers"
         run: >-
@@ -195,7 +198,7 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: backend
-          path: server/ui
+          path: server/
 
       - name: "Download frontend"
         uses: actions/download-artifact@v2
@@ -213,6 +216,5 @@ jobs:
           PLAYGROUND_GITHUB_TOKEN: not-really-set-yet
           PLAYGROUND_CORS_ENABLED: t
         run: |
-          ./server/ui &
+          chmod +x ./server/ui && ./server/ui &
           bundle exec rspec tests/spec
-
