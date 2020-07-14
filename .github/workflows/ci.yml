@@ -164,8 +164,9 @@ jobs:
       - build_backend
       - build_frontend
 
-    env:
-      BUNDLE_GEMFILE: ${{ env.GITHUB_WORKSPACE }}/tests/Gemfile
+    defaults:
+      run:
+        working-directory: tests
 
     steps:
       - name: "Checkout code"
@@ -187,7 +188,7 @@ jobs:
       - name: "Install gems"
         run: |
           gem install bundler
-          bundle config path tests/vendor/bundle
+          bundle config path vendor/bundle
           bundle install --jobs 4 --retry 3
 
       - name: "Pull containers"
@@ -198,13 +199,13 @@ jobs:
         uses: actions/download-artifact@v2
         with:
           name: backend
-          path: server/
+          path: tests/server/
 
       - name: "Download frontend"
         uses: actions/download-artifact@v2
         with:
           name: frontend
-          path: server/built/
+          path: tests/server/built/
 
       - name: "Inspect"
         run: >-
@@ -217,4 +218,4 @@ jobs:
           PLAYGROUND_CORS_ENABLED: t
         run: |
           chmod +x ./server/ui && ./server/ui &
-          cd tests && bundle exec rspec
+          bundle exec rspec
