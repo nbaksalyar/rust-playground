@@ -165,7 +165,7 @@ jobs:
       - build_frontend
 
     env:
-      BUNDLE_GEMFILE: $HOME/tests/Gemfile
+      BUNDLE_GEMFILE: ${{ env.GITHUB_WORKSPACE }}/tests/Gemfile
 
     steps:
       - name: "Checkout code"
