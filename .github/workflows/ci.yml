@@ -165,7 +165,7 @@ jobs:
       - build_frontend
 
     env:
-      BUNDLE_GEMFILE: tests/Gemfile
+      BUNDLE_GEMFILE: $HOME/tests/Gemfile
 
     steps:
       - name: "Checkout code"
@@ -179,8 +179,8 @@ jobs:
       - name: "Cache bundler intermediate products"
         uses: actions/cache@v2
         with:
-          path: test/vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('test/**/Gemfile.lock') }}
+          path: tests/vendor/bundle
+          key: ${{ runner.os }}-gems-${{ hashFiles('tests/**/Gemfile.lock') }}
           restore-keys: |
             ${{ runner.os }}-gems-
 
