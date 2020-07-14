@@ -192,8 +192,14 @@ jobs:
           bundle install --jobs 4 --retry 3
 
       - name: "Pull containers"
-        run: >-
+        run: |
           echo quay.io/shepmaster/rust-playground-ci-{rust-{stable,beta,nightly},tool-{clippy,rustfmt,miri}} | xargs -n1 docker pull
+          docker tag quay.io/shepmaster/rust-playground-ci-rust-stable rust-stable
+          docker tag quay.io/shepmaster/rust-playground-ci-rust-beta rust-beta
+          docker tag quay.io/shepmaster/rust-playground-ci-rust-nightly rust-nightly
+          docker tag quay.io/shepmaster/rust-playground-ci-tool-clippy clippy
+          docker tag quay.io/shepmaster/rust-playground-ci-tool-rustfmt rustfmt
+          docker tag quay.io/shepmaster/rust-playground-ci-tool-miri miri
 
       - name: "Download backend"
         uses: actions/download-artifact@v2
@@ -206,10 +212,6 @@ jobs:
         with:
           name: frontend
           path: tests/server/built/
-
-      - name: "Inspect"
-        run: >-
-          ls -lR server
 
       - name: "Run tests"
         env:
