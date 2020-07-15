@@ -218,6 +218,7 @@ jobs:
           PLAYGROUND_UI_ROOT: server/built/
           PLAYGROUND_GITHUB_TOKEN: not-really-set-yet
           PLAYGROUND_CORS_ENABLED: t
+          PLAYGROUND_GITHUB_TOKEN: ${{ secrets.PLAYGROUND_GITHUB_TOKEN }}
         run: |
           chmod +x ./server/ui && ./server/ui &
           bundle exec rspec
