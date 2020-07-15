@@ -12,60 +12,60 @@ env:
   QUAY_IO_USERNAME: shepmaster
 
 jobs:
-  # build_compiler_containers:
-  #   name: "Build ${{ matrix.channel }} compiler container"
-  #   runs-on: ubuntu-latest
+  build_compiler_containers:
+    name: "Build ${{ matrix.channel }} compiler container"
+    runs-on: ubuntu-latest
 
-  #   strategy:
-  #     matrix:
-  #       channel: [stable, beta, nightly]
+    strategy:
+      matrix:
+        channel: [stable, beta, nightly]
 
-  #   steps:
-  #     - name: "Checkout code"
-  #       uses: actions/checkout@v2
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
 
-  #     - name: "Build and push container"
-  #       uses: docker/build-push-action@v1
-  #       with:
-  #         username: ${{ env.QUAY_IO_USERNAME }}
-  #         password: ${{ secrets.QUAY_IO_PASSWORD }}
-  #         registry: quay.io
-  #         repository: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}
-  #         tags: ${{ github.run_id }},latest
-  #         path: compiler/base/
-  #         build_args: channel=${{ matrix.channel }}
-  #         always_pull: true
-  #         cache_froms: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:${{ github.run_id }},shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:latest
-  #         labels: quay.expires-after=1w
+      - name: "Build and push container"
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ env.QUAY_IO_USERNAME }}
+          password: ${{ secrets.QUAY_IO_PASSWORD }}
+          registry: quay.io
+          repository: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}
+          tags: ${{ github.run_id }},latest
+          path: compiler/base/
+          build_args: channel=${{ matrix.channel }}
+          always_pull: true
+          cache_froms: shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:${{ github.run_id }},shepmaster/rust-playground-ci-rust-${{ matrix.channel }}:latest
+          labels: quay.expires-after=1w
 
-  #         # always_pull -- not working
+          # always_pull -- not working
 
-  # build_tool_containers:
-  #   name: "Build ${{ matrix.tool }} tool container"
-  #   runs-on: ubuntu-latest
-  #   needs: build_compiler_containers
-  #   continue-on-error: true
+  build_tool_containers:
+    name: "Build ${{ matrix.tool }} tool container"
+    runs-on: ubuntu-latest
+    needs: build_compiler_containers
+    continue-on-error: true
 
-  #   strategy:
-  #     matrix:
-  #       tool: [clippy, rustfmt, miri]
+    strategy:
+      matrix:
+        tool: [clippy, rustfmt, miri]
 
-  #   steps:
-  #     - name: "Checkout code"
-  #       uses: actions/checkout@v2
+    steps:
+      - name: "Checkout code"
+        uses: actions/checkout@v2
 
-  #     - name: "Build and push container"
-  #       uses: docker/build-push-action@v1
-  #       with:
-  #         username: ${{ env.QUAY_IO_USERNAME }}
-  #         password: ${{ secrets.QUAY_IO_PASSWORD }}
-  #         registry: quay.io
-  #         repository: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}
-  #         tags: ${{ github.run_id }},latest
-  #         path: compiler/${{ matrix.tool }}/
-  #         always_pull: true
-  #         cache_froms: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:${{ github.run_id }},shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:latest
-  #         labels: quay.expires-after=1w
+      - name: "Build and push container"
+        uses: docker/build-push-action@v1
+        with:
+          username: ${{ env.QUAY_IO_USERNAME }}
+          password: ${{ secrets.QUAY_IO_PASSWORD }}
+          registry: quay.io
+          repository: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}
+          tags: ${{ github.run_id }},latest
+          path: compiler/${{ matrix.tool }}/
+          always_pull: true
+          cache_froms: shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:${{ github.run_id }},shepmaster/rust-playground-ci-tool-${{ matrix.tool }}:latest
+          labels: quay.expires-after=1w
 
   build_backend:
     name: "Build backend"
@@ -161,6 +161,8 @@ jobs:
     name: "Running integration tests"
     runs-on: ubuntu-latest
     needs:
+      - build_compiler_containers
+      - build_tool_containers
       - build_backend
       - build_frontend
 
@@ -216,7 +218,7 @@ jobs:
       - name: "Run tests"
         env:
           PLAYGROUND_UI_ROOT: server/built/
-          PLAYGROUND_CORS_ENABLED: t
+          PLAYGROUND_CORS_ENABLED: true
           PLAYGROUND_GITHUB_TOKEN: ${{ secrets.PLAYGROUND_GITHUB_TOKEN }}
         run: |
           chmod +x ./server/ui && ./server/ui &
