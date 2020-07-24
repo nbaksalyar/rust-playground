@@ -3,11 +3,9 @@ import { makePosition } from './types';
 
 export function configureRustErrors({
   enableFeatureGate,
-  getChannel,
   gotoPosition,
   selectText,
   addImport,
-  reExecuteWithBacktrace,
 }) {
   Prism.languages.rust_errors = {
     'warning': {
@@ -59,7 +57,7 @@ export function configureRustErrors({
       const errorMatch = /E\d+/.exec(env.content);
       const [errorCode] = errorMatch;
       env.tag = 'a';
-      env.attributes.href = `https://doc.rust-lang.org/${getChannel()}/error-index.html#${errorCode}`;
+      env.attributes.href = `https://doc.rust-lang.org/stable/error-index.html#${errorCode}`;
       env.attributes.target = '_blank';
     }
     if (env.type === 'see-issue') {
@@ -147,14 +145,6 @@ export function configureRustErrors({
         e.preventDefault();
         enableFeatureGate(link.dataset.featureGate);
         gotoPosition(1, 1);
-      };
-    });
-
-    const backtraceEnablers = env.element.querySelectorAll('.backtrace-enable');
-    Array.from(backtraceEnablers).forEach((link: HTMLAnchorElement) => {
-      link.onclick = e => {
-        e.preventDefault();
-        reExecuteWithBacktrace();
       };
     });
 

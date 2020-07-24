@@ -18,7 +18,6 @@ import {
   addImport,
   performCratesLoad,
   performVersionsLoad,
-  reExecuteWithBacktrace,
 } from './actions';
 import { configureRustErrors } from './highlighting';
 import localStorage from './local_storage';
@@ -52,8 +51,6 @@ configureRustErrors({
   gotoPosition: (line, col) => store.dispatch(gotoPosition(line, col)),
   selectText: (start, end) => store.dispatch(selectText(start, end)),
   addImport: (code) => store.dispatch(addImport(code)),
-  reExecuteWithBacktrace: () => store.dispatch(reExecuteWithBacktrace()),
-  getChannel: () => store.getState().configuration.channel,
 });
 
 store.dispatch(performCratesLoad());

@@ -14,37 +14,13 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.ChangeFocus:
       return { ...state, focus: action.focus };
 
-    case ActionType.RequestClippy:
-      return { ...state, focus: Focus.Clippy };
-
-    case ActionType.RequestMiri:
-      return { ...state, focus: Focus.Miri };
-
-    case ActionType.RequestMacroExpansion:
-      return { ...state, focus: Focus.MacroExpansion };
-
-    case ActionType.CompileLlvmIrRequest:
-      return { ...state, focus: Focus.LlvmIr };
-
-    case ActionType.CompileMirRequest:
-      return { ...state, focus: Focus.Mir };
-
-    case ActionType.CompileWasmRequest:
-      return { ...state, focus: Focus.Wasm };
-
-    case ActionType.CompileAssemblyRequest:
-      return { ...state, focus: Focus.Asm };
-
     case ActionType.ExecuteRequest:
       return { ...state, focus: Focus.Execute };
 
     case ActionType.RequestFormat:
       return { ...state, focus: Focus.Format };
-    case ActionType.FormatSucceeded:
-      return { ...state, focus: null };
 
     case ActionType.RequestGistLoad:
-    case ActionType.RequestGistSave:
       return { ...state, focus: Focus.Gist };
 
     default:

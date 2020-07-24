@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { connect } from 'react-redux';
 
 import State from './state';
-import { CommonEditorProps, Crate, Edition, Focus, PairCharacters, Position, Selection } from './types';
+import { CommonEditorProps, Crate, Focus, PairCharacters, Position, Selection } from './types';
 
 type Ace = typeof import('ace-builds');
 type AceEditor = import('ace-builds').Ace.Editor;
@@ -475,7 +475,7 @@ const mapStateToProps = (state: State) => {
     pairCharacters,
     keybinding: keybinding === 'ace' ? null : keybinding,
     focus: state.output.meta.focus,
-    autocompleteOnUse: state.configuration.edition === Edition.Rust2018,
+    autocompleteOnUse: true,
   };
 };
 
