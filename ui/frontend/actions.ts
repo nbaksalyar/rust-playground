@@ -205,13 +205,6 @@ function performAutoOnly(): ThunkAction {
 
 const performExecuteOnly = (): ThunkAction => performCommonExecute();
 
-interface CompileRequestBody extends ExecuteRequestBody {
-  target: string;
-  assemblyFlavor: string;
-  demangleAssembly: string;
-  processAssembly: string;
-}
-
 const PRIMARY_ACTIONS: { [index in PrimaryAction]: () => ThunkAction } = {
   [PrimaryActionCore.Execute]: performExecuteOnly,
   [PrimaryActionAuto.Auto]: performAutoOnly,
@@ -251,18 +244,6 @@ export const selectText = (start: Position, end: Position) =>
 
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
-
-interface FormatRequestBody {
-  code: string;
-  edition: string;
-}
-
-interface FormatResponseBody {
-  code: string;
-  stdout: string;
-  stderr: string;
-  error: string;
-}
 
 interface GistSuccessProps {
   id: string;

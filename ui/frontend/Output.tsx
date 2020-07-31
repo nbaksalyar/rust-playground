@@ -32,16 +32,6 @@ interface TabProps {
   tabProps: object;
 }
 
-const PaneWithCode: React.SFC<PaneWithCodeProps> = ({ code, ...rest }) => (
-  <SimplePane {...rest}>
-    <Section kind="code" label="Result">{code}</Section>
-  </SimplePane>
-);
-
-interface PaneWithCodeProps extends SimplePaneProps {
-  code?: string;
-}
-
 const Output: React.SFC = () => {
   const somethingToShow = useSelector(selectors.getSomethingToShow);
   const { meta: { focus }, execute } =
@@ -50,7 +40,6 @@ const Output: React.SFC = () => {
   const dispatch = useDispatch();
   const focusClose = useCallback(() => dispatch(actions.changeFocus(null)), [dispatch]);
   const focusExecute = useCallback(() => dispatch(actions.changeFocus(Focus.Execute)), [dispatch]);
-  const focusFormat = useCallback(() => dispatch(actions.changeFocus(Focus.Format)), [dispatch]);
 
   if (!somethingToShow) {
     return null;
