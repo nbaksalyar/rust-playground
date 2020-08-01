@@ -3,13 +3,10 @@ import { useSelector } from 'react-redux';
 
 import Editor from './Editor';
 import Header from './Header';
-import Notifications from './Notifications';
 import Output from './Output';
-import * as selectors from './selectors';
 import State from './state';
 
 const Playground: React.SFC = () => {
-  const showNotifications = useSelector(selectors.anyNotificationsToShowSelector);
   const focus = useSelector((state: State) => state.output.meta.focus);
   const splitOrientation = useSelector((state: State) => state.configuration.orientation);
 
@@ -32,7 +29,6 @@ const Playground: React.SFC = () => {
           </div>
         </div>
       </div>
-      {showNotifications && <Notifications />}
     </div>
   );
 };

@@ -91,18 +91,3 @@ export const codeUrlSelector = createSelector(
     return url.format(u);
   },
 );
-
-const notificationsSelector = (state: State) => state.notifications;
-
-const NOW = new Date();
-const RUST_2018_DEFAULT_END = new Date('2019-01-01T00:00:00Z');
-const RUST_2018_DEFAULT_OPEN = NOW <= RUST_2018_DEFAULT_END;
-export const showRust2018IsDefaultSelector = createSelector(
-  notificationsSelector,
-  notifications => RUST_2018_DEFAULT_OPEN && !notifications.seenRust2018IsDefault,
-);
-
-export const anyNotificationsToShowSelector = createSelector(
-  showRust2018IsDefaultSelector,
-  allNotifications => allNotifications,
-);

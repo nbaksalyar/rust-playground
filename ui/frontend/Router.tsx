@@ -12,33 +12,18 @@ import * as actions from './actions';
 const homeRoute = new Route('/');
 const helpRoute = new Route('/help');
 
-const stateSelector = ({ page, configuration: { channel, mode, edition } }) => ({
+const stateSelector = ({ page, configuration }) => ({
   page,
-  configuration: {
-    channel,
-    mode,
-    edition,
-  },
+  configuration
 });
 
 const stateToLocation = ({ page, configuration }) => {
   switch (page) {
-    case 'help': {
-      return {
-        pathname: '/help',
-      };
-    }
+    case 'help':
+      return { pathname: '/help' };
 
-    default: {
-      const query = {
-        version: configuration.channel,
-        mode: configuration.mode,
-        edition: configuration.edition,
-      };
-      return {
-        pathname: `/?${qs.stringify(query)}`,
-      };
-    }
+    default:
+      return { pathname: '/' };
   }
 };
 

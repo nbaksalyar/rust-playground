@@ -22,19 +22,6 @@ import {
 
 const routes = {
   compile: { pathname: '/compile' },
-  execute: { pathname: '/execute' },
-  meta: {
-    crates: { pathname: '/meta/crates' },
-    version: {
-      stable: '/meta/version/stable',
-      beta: '/meta/version/beta',
-      nightly: '/meta/version/nightly',
-      rustfmt: '/meta/version/rustfmt',
-      clippy: '/meta/version/clippy',
-      miri: '/meta/version/miri',
-    },
-    gist: { pathname: '/meta/gist/' },
-  },
 };
 
 type ThunkAction<T = void> = ReduxThunkAction<T, State, {}, Action>;
@@ -50,36 +37,20 @@ export enum ActionType {
   ChangeTheme = 'CHANGE_THEME',
   ChangePairCharacters = 'CHANGE_PAIR_CHARACTERS',
   ChangeOrientation = 'CHANGE_ORIENTATION',
-  ChangeAssemblyFlavor = 'CHANGE_ASSEMBLY_FLAVOR',
   ChangePrimaryAction = 'CHANGE_PRIMARY_ACTION',
-  ChangeChannel = 'CHANGE_CHANNEL',
-  ChangeDemangleAssembly = 'CHANGE_DEMANGLE_ASSEMBLY',
-  ChangeProcessAssembly = 'CHANGE_PROCESS_ASSEMBLY',
-  ChangeMode = 'CHANGE_MODE',
-  ChangeEdition = 'CHANGE_EDITION',
   ChangeBacktrace = 'CHANGE_BACKTRACE',
   ChangeFocus = 'CHANGE_FOCUS',
-  ExecuteRequest = 'EXECUTE_REQUEST',
-  ExecuteSucceeded = 'EXECUTE_SUCCEEDED',
-  ExecuteFailed = 'EXECUTE_FAILED',
+  CompileRequest = 'COMPILE_REQUEST',
+  CompileSucceeded = 'COMPILE_SUCCEEDED',
+  CompileFailed = 'COMPILE_FAILED',
   EditCode = 'EDIT_CODE',
   AddMainFunction = 'ADD_MAIN_FUNCTION',
   AddImport = 'ADD_IMPORT',
   EnableFeatureGate = 'ENABLE_FEATURE_GATE',
   GotoPosition = 'GOTO_POSITION',
   SelectText = 'SELECT_TEXT',
-  RequestFormat = 'REQUEST_FORMAT',
   FormatSucceeded = 'FORMAT_SUCCEEDED',
   FormatFailed = 'FORMAT_FAILED',
-  RequestClippy = 'REQUEST_CLIPPY',
-  ClippySucceeded = 'CLIPPY_SUCCEEDED',
-  ClippyFailed = 'CLIPPY_FAILED',
-  RequestMiri = 'REQUEST_MIRI',
-  MiriSucceeded = 'MIRI_SUCCEEDED',
-  MiriFailed = 'MIRI_FAILED',
-  RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
-  MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
-  MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
   NotificationSeen = 'NOTIFICATION_SEEN',
 }
 
@@ -110,14 +81,14 @@ const changePrimaryAction = (primaryAction: PrimaryAction) =>
 export const changeFocus = (focus: Focus) =>
   createAction(ActionType.ChangeFocus, { focus });
 
-const requestExecute = () =>
-  createAction(ActionType.ExecuteRequest);
+const requestCompile = () =>
+  createAction(ActionType.CompileRequest);
 
-const receiveExecuteSuccess = ({ body, stderr, isAutoBuild }) =>
-  createAction(ActionType.ExecuteSucceeded, { body, stderr, isAutoBuild });
+const receiveCompileSuccess = ({ body, stderr, isAutoBuild }) =>
+  createAction(ActionType.CompileSucceeded, { body, stderr, isAutoBuild });
 
-const receiveExecuteFailure = ({ error, isAutoBuild }) =>
-  createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
+const receiveCompileFailure = ({ error, isAutoBuild }) =>
+  createAction(ActionType.CompileFailed, { error, isAutoBuild });
 
 async function jsonPost(urlObj, body) {
   const args = {
@@ -170,7 +141,7 @@ interface ExecuteRequestBody {
 }
 
 const performCommonExecute = (): ThunkAction => (dispatch, getState) => {
-  dispatch(requestExecute());
+  dispatch(requestCompile());
 
   const state = getState();
   const { code } = state;
@@ -178,9 +149,9 @@ const performCommonExecute = (): ThunkAction => (dispatch, getState) => {
 
   const body: ExecuteRequestBody = { code };
 
-  return jsonPost(routes.execute, body)
-    .then(res => dispatch(receiveExecuteSuccess({ body: res.body, stderr: res.stderr, isAutoBuild })))
-    .catch(res => dispatch(receiveExecuteFailure({ error: res.error, isAutoBuild })));
+  return jsonPost(routes.compile, body)
+    .then(res => dispatch(receiveCompileSuccess({ body: res.body, stderr: res.stderr, isAutoBuild })))
+    .catch(res => dispatch(receiveCompileFailure({ error: res.error, isAutoBuild })));
 };
 
 function performAutoOnly(): ThunkAction {
@@ -229,9 +200,6 @@ export const gotoPosition = (line: string | number, column: string | number) =>
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
 
-const requestFormat = () =>
-  createAction(ActionType.RequestFormat);
-
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
@@ -269,15 +237,14 @@ export type Action =
   | ReturnType<typeof changeOrientation>
   | ReturnType<typeof changePrimaryAction>
   | ReturnType<typeof changeTheme>
-  | ReturnType<typeof requestExecute>
-  | ReturnType<typeof receiveExecuteSuccess>
-  | ReturnType<typeof receiveExecuteFailure>
+  | ReturnType<typeof requestCompile>
+  | ReturnType<typeof receiveCompileSuccess>
+  | ReturnType<typeof receiveCompileFailure>
   | ReturnType<typeof editCode>
   | ReturnType<typeof addMainFunction>
   | ReturnType<typeof addImport>
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof requestFormat>
   | ReturnType<typeof notificationSeen>
   ;

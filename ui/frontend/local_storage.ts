@@ -18,7 +18,6 @@ export function serialize(state: State) {
       orientation: state.configuration.orientation,
     },
     code: state.code,
-    notifications: state.notifications,
   });
 }
 

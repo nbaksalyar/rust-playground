@@ -14,11 +14,8 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.ChangeFocus:
       return { ...state, focus: action.focus };
 
-    case ActionType.ExecuteRequest:
+    case ActionType.CompileRequest:
       return { ...state, focus: Focus.Execute };
-
-    case ActionType.RequestFormat:
-      return { ...state, focus: Focus.Format };
 
     default:
       return state;

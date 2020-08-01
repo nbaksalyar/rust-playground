@@ -19,13 +19,13 @@ interface State {
 
 export default function execute(state = DEFAULT, action: Action) {
   switch (action.type) {
-    case ActionType.ExecuteRequest:
+    case ActionType.CompileRequest:
       return start(DEFAULT, state);
-    case ActionType.ExecuteSucceeded: {
+    case ActionType.CompileSucceeded: {
       const { body = '', stderr = '', isAutoBuild } = action;
       return finish(state, { body, stderr, isAutoBuild });
     }
-    case ActionType.ExecuteFailed: {
+    case ActionType.CompileFailed: {
       const { error, isAutoBuild } = action;
       return finish(state, { error, isAutoBuild });
     }

@@ -5,7 +5,6 @@ import * as actions from './actions';
 import { State } from './reducers';
 import { Focus } from './types';
 
-import Execute from './Output/Execute';
 import * as selectors from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {
@@ -36,7 +35,6 @@ const Output: React.SFC = () => {
     useSelector((state: State) => state.output);
 
   const dispatch = useDispatch();
-  const focusClose = useCallback(() => dispatch(actions.changeFocus(null)), [dispatch]);
   const focusExecute = useCallback(() => dispatch(actions.changeFocus(Focus.Execute)), [dispatch]);
 
   if (!somethingToShow) {
@@ -45,18 +43,6 @@ const Output: React.SFC = () => {
 
   let close = null;
   let body = null;
-  if (focus) {
-    close = (
-      <button className="output-tab output-tab-close"
-        onClick={focusClose}>Close</button>
-    );
-
-    body = (
-      <div className="output-body">
-        {focus === Focus.Execute && <Execute />}
-      </div>
-    );
-  }
 
   return (
     <div className="output">
