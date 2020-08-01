@@ -17,7 +17,7 @@ interface State {
   isAutoBuild: boolean;
 }
 
-export default function execute(state = DEFAULT, action: Action) {
+export default function compile(state = DEFAULT, action: Action) {
   switch (action.type) {
     case ActionType.CompileRequest:
       return start(DEFAULT, state);

@@ -57,7 +57,7 @@ export const getExecutionLabel = createSelector(primaryActionSelector, primaryAc
 export const hasProperties = obj => Object.values(obj).some(val => !!val);
 
 const getOutputs = (state: State) => [
-  state.output.execute,
+  state.output.compile,
 ];
 
 export const getSomethingToShow = createSelector(

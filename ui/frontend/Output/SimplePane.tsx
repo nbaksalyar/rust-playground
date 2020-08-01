@@ -26,7 +26,6 @@ export interface SimplePaneProps extends ReallySimplePaneProps {
 
 export interface ReallySimplePaneProps {
   requestsInProgress: number;
-  stdout?: string;
   stderr?: string;
   error?: string;
 }
@@ -36,7 +35,6 @@ const SimplePane: React.SFC<SimplePaneProps> = props => (
     {(props.requestsInProgress > 0) && <Loader />}
     <Section kind="error" label="Errors">{props.error}</Section>
     <HighlightErrors label="Standard Error">{props.stderr}</HighlightErrors>
-    <Section kind="stdout" label="Standard Output">{props.stdout}</Section>
     {props.children}
   </div>
 );

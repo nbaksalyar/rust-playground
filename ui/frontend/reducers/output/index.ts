@@ -1,11 +1,11 @@
 import { combineReducers } from 'redux';
 
-import execute from './execute';
+import compile from './compile';
 import meta from './meta';
 
 const output = combineReducers({
   meta,
-  execute,
+  compile,
 });
 
 export type State = ReturnType<typeof output>;

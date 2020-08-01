@@ -22,11 +22,9 @@ describe('restoring saved state', () => {
     const parsed = easyDeserialize({
       configuration: { theme: 'xcode' },
       code: 'not default code',
-      notifications: { seenRustSurvey2018: true },
     });
 
     expect(parsed.configuration.theme).toEqual('xcode');
     expect(parsed.code).toEqual('not default code');
-    expect(parsed.notifications.seenRustSurvey2018).toBe(true);
   });
 });

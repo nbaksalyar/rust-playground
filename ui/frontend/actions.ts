@@ -51,7 +51,6 @@ export enum ActionType {
   SelectText = 'SELECT_TEXT',
   FormatSucceeded = 'FORMAT_SUCCEEDED',
   FormatFailed = 'FORMAT_FAILED',
-  NotificationSeen = 'NOTIFICATION_SEEN',
 }
 
 const setPage = (page: Page) =>
@@ -118,7 +117,7 @@ async function jsonPost(urlObj, body) {
         error: `Could not get response body: ${error.toString()}`,
       });
     }
-    return { body, stdout: null };
+    return { body };
   } else if (response.status == 400) {
     // Compilation failed
     let stderr;
@@ -129,7 +128,7 @@ async function jsonPost(urlObj, body) {
         error: `Could not parse stderr: ${error.toString()}`,
       });
     }
-    return { stderr, body: null, stdout: null };
+    return { stderr, body: null };
   } else {
     // HTTP 4xx, 5xx (e.g. malformed JSON request)
     throw response;
@@ -200,11 +199,6 @@ export const gotoPosition = (line: string | number, column: string | number) =>
 export const selectText = (start: Position, end: Position) =>
   createAction(ActionType.SelectText, { start, end });
 
-const notificationSeen = (notification: Notification) =>
-  createAction(ActionType.NotificationSeen, { notification });
-
-export const seenRust2018IsDefault = () => notificationSeen(Notification.Rust2018IsDefault);
-
 export function indexPageLoad({
   code,
 }): ThunkAction {
@@ -246,5 +240,4 @@ export type Action =
   | ReturnType<typeof enableFeatureGate>
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
-  | ReturnType<typeof notificationSeen>
   ;
