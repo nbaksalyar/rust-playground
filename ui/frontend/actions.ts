@@ -9,7 +9,6 @@ import State from './state';
 import {
   Editor,
   Focus,
-  Notification,
   Orientation,
   Page,
   PairCharacters,
@@ -112,6 +111,7 @@ async function jsonPost(urlObj, body) {
     let body;
     try {
       body = await response.arrayBuffer();
+      body = await WebAssembly.compile(body)
     } catch (error) {
       throw ({
         error: `Could not get response body: ${error.toString()}`,

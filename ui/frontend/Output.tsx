@@ -14,6 +14,16 @@ const Output: React.SFC = () => {
     return null;
   }
 
+  if (details.body != null) {
+    WebAssembly.instantiate(details.body, { env: { alert: function (v) { alert(v); }} })
+      .then((instance) => {
+        if (instance.exports.main) {
+          let main = instance.exports.main as CallableFunction;
+          main();
+        }
+      });
+  }
+
   return (
     <div className="output">
       <div className="output-body">

@@ -22,7 +22,7 @@ export default function compile(state = DEFAULT, action: Action) {
     case ActionType.CompileRequest:
       return start(DEFAULT, state);
     case ActionType.CompileSucceeded: {
-      const { body = '', stderr = '', isAutoBuild } = action;
+      const { body = null, stderr = '', isAutoBuild } = action;
       return finish(state, { body, stderr, isAutoBuild });
     }
     case ActionType.CompileFailed: {
