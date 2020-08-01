@@ -1,6 +1,6 @@
 import fetch from 'isomorphic-fetch';
 import { ThunkAction as ReduxThunkAction } from 'redux-thunk';
-import url from 'url';
+import Url from 'url';
 
 import {
   isAutoBuildSelector,
@@ -80,16 +80,6 @@ export enum ActionType {
   RequestMacroExpansion = 'REQUEST_MACRO_EXPANSION',
   MacroExpansionSucceeded = 'MACRO_EXPANSION_SUCCEEDED',
   MacroExpansionFailed = 'MACRO_EXPANSION_FAILED',
-  RequestGistLoad = 'REQUEST_GIST_LOAD',
-  GistLoadSucceeded = 'GIST_LOAD_SUCCEEDED',
-  GistLoadFailed = 'GIST_LOAD_FAILED',
-  RequestGistSave = 'REQUEST_GIST_SAVE',
-  GistSaveSucceeded = 'GIST_SAVE_SUCCEEDED',
-  GistSaveFailed = 'GIST_SAVE_FAILED',
-  RequestCratesLoad = 'REQUEST_CRATES_LOAD',
-  CratesLoadSucceeded = 'CRATES_LOAD_SUCCEEDED',
-  RequestVersionsLoad = 'REQUEST_VERSIONS_LOAD',
-  VersionsLoadSucceeded = 'VERSIONS_LOAD_SUCCEEDED',
   NotificationSeen = 'NOTIFICATION_SEEN',
 }
 
@@ -123,36 +113,23 @@ export const changeFocus = (focus: Focus) =>
 const requestExecute = () =>
   createAction(ActionType.ExecuteRequest);
 
-const receiveExecuteSuccess = ({ stdout, stderr, isAutoBuild }) =>
-  createAction(ActionType.ExecuteSucceeded, { stdout, stderr, isAutoBuild });
+const receiveExecuteSuccess = ({ body, stderr, isAutoBuild }) =>
+  createAction(ActionType.ExecuteSucceeded, { body, stderr, isAutoBuild });
 
 const receiveExecuteFailure = ({ error, isAutoBuild }) =>
   createAction(ActionType.ExecuteFailed, { error, isAutoBuild });
 
-function jsonGet(urlObj) {
-  const urlStr = url.format(urlObj);
-
-  return fetchJson(urlStr, {
-    method: 'get',
-  });
-}
-
-function jsonPost(urlObj, body) {
-  const urlStr = url.format(urlObj);
-
-  return fetchJson(urlStr, {
+async function jsonPost(urlObj, body) {
+  const args = {
     method: 'post',
     body: JSON.stringify(body),
-  });
-}
+  };
 
-async function fetchJson(url, args) {
-  const { headers = {} } = args;
-  headers['Content-Type'] = 'application/json';
+  const headers = {'Content-Type': 'application/json'};
 
   let response;
   try {
-    response = await fetch(url, { ...args, headers });
+    response = await fetch(Url.format(urlObj), { ...args, headers });
   } catch (networkError) {
     // e.g. server unreachable
     throw ({
@@ -160,21 +137,31 @@ async function fetchJson(url, args) {
     });
   }
 
-  let body;
-  try {
-    body = await response.json();
-  } catch (convertError) {
-    throw ({
-      error: `Response was not JSON: ${convertError.toString()}`,
-    });
-  }
-
   if (response.ok) {
     // HTTP 2xx
-    return body;
+    let body;
+    try {
+      body = await response.arrayBuffer();
+    } catch (error) {
+      throw ({
+        error: `Could not get response body: ${error.toString()}`,
+      });
+    }
+    return { body, stdout: null };
+  } else if (response.status == 400) {
+    // Compilation failed
+    let stderr;
+    try {
+      stderr = await response.text();
+    } catch (error) {
+      throw ({
+        error: `Could not parse stderr: ${error.toString()}`,
+      });
+    }
+    return { stderr, body: null, stdout: null };
   } else {
     // HTTP 4xx, 5xx (e.g. malformed JSON request)
-    throw body;
+    throw response;
   }
 }
 
@@ -192,8 +179,8 @@ const performCommonExecute = (): ThunkAction => (dispatch, getState) => {
   const body: ExecuteRequestBody = { code };
 
   return jsonPost(routes.execute, body)
-    .then(json => dispatch(receiveExecuteSuccess({ ...json, isAutoBuild })))
-    .catch(json => dispatch(receiveExecuteFailure({ ...json, isAutoBuild })));
+    .then(res => dispatch(receiveExecuteSuccess({ body: res.body, stderr: res.stderr, isAutoBuild })))
+    .catch(res => dispatch(receiveExecuteFailure({ error: res.error, isAutoBuild })));
 };
 
 function performAutoOnly(): ThunkAction {
@@ -245,84 +232,6 @@ export const selectText = (start: Position, end: Position) =>
 const requestFormat = () =>
   createAction(ActionType.RequestFormat);
 
-interface GistSuccessProps {
-  id: string;
-  url: string;
-  code: string;
-  stdout: string;
-  stderr: string;
-}
-
-const requestGistLoad = () =>
-  createAction(ActionType.RequestGistLoad);
-
-const receiveGistLoadSuccess = (props: GistSuccessProps) =>
-  createAction(ActionType.GistLoadSucceeded, props);
-
-const receiveGistLoadFailure = () => // eslint-disable-line no-unused-vars
-  createAction(ActionType.GistLoadFailed);
-
-type PerformGistLoadProps =
-  Pick<GistSuccessProps, Exclude<keyof GistSuccessProps, 'url' | 'code' | 'stdout' | 'stderr'>>;
-
-export function performGistLoad({ id }: PerformGistLoadProps): ThunkAction {
-  return function(dispatch, _getState) {
-    dispatch(requestGistLoad());
-    const u = url.resolve(routes.meta.gist.pathname, id);
-    jsonGet(u)
-      .then(gist => dispatch(receiveGistLoadSuccess({ ...gist })));
-    // TODO: Failure case
-  };
-}
-
-const requestCratesLoad = () =>
-  createAction(ActionType.RequestCratesLoad);
-
-const receiveCratesLoadSuccess = ({ crates }) =>
-  createAction(ActionType.CratesLoadSucceeded, { crates });
-
-export function performCratesLoad(): ThunkAction {
-  return function(dispatch) {
-    dispatch(requestCratesLoad());
-
-    return jsonGet(routes.meta.crates)
-      .then(json => dispatch(receiveCratesLoadSuccess(json)));
-    // TODO: Failure case
-  };
-}
-
-const requestVersionsLoad = () =>
-  createAction(ActionType.RequestVersionsLoad);
-
-const receiveVersionsLoadSuccess = ({ stable, beta, nightly, rustfmt, clippy, miri }) =>
-  createAction(ActionType.VersionsLoadSucceeded, { stable, beta, nightly, rustfmt, clippy, miri });
-
-export function performVersionsLoad(): ThunkAction {
-  return function(dispatch) {
-    dispatch(requestVersionsLoad());
-
-    const stable = jsonGet(routes.meta.version.stable);
-    const beta = jsonGet(routes.meta.version.beta);
-    const nightly = jsonGet(routes.meta.version.nightly);
-    const rustfmt = jsonGet(routes.meta.version.rustfmt);
-    const clippy = jsonGet(routes.meta.version.clippy);
-    const miri = jsonGet(routes.meta.version.miri);
-
-    const all = Promise.all([stable, beta, nightly, rustfmt, clippy, miri]);
-
-    return all
-      .then(([stable, beta, nightly, rustfmt, clippy, miri]) => dispatch(receiveVersionsLoadSuccess({
-        stable,
-        beta,
-        nightly,
-        rustfmt,
-        clippy,
-        miri,
-      })));
-    // TODO: Failure case
-  };
-}
-
 const notificationSeen = (notification: Notification) =>
   createAction(ActionType.NotificationSeen, { notification });
 
@@ -370,12 +279,5 @@ export type Action =
   | ReturnType<typeof gotoPosition>
   | ReturnType<typeof selectText>
   | ReturnType<typeof requestFormat>
-  | ReturnType<typeof requestGistLoad>
-  | ReturnType<typeof receiveGistLoadSuccess>
-  | ReturnType<typeof receiveGistLoadFailure>
-  | ReturnType<typeof requestCratesLoad>
-  | ReturnType<typeof receiveCratesLoadSuccess>
-  | ReturnType<typeof requestVersionsLoad>
-  | ReturnType<typeof receiveVersionsLoadSuccess>
   | ReturnType<typeof notificationSeen>
   ;

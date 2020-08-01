@@ -18,10 +18,10 @@ const displayExternCrateAutocomplete = (editor: AceEditor, autocompleteOnUse: bo
     (autocompleteOnUse && !!precedingText.match(/^\s*use\s+(?!crate|self|super)\w*$/));
 };
 
-const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): AceCompleter => ({
+const buildCrateAutocompleter = (autocompleteOnUse: boolean): AceCompleter => ({
   getCompletions: (editor, _session, _pos, _prefix, callback) => {
     let suggestions = [];
-
+/*
     if (displayExternCrateAutocomplete(editor, autocompleteOnUse)) {
       const len = crates.length;
 
@@ -32,7 +32,7 @@ const buildCrateAutocompleter = (autocompleteOnUse: boolean, crates: Crate[]): A
         score: len - i, // Force alphabetic order before anything is typed
       }));
     }
-
+*/
     callback(null, suggestions);
   },
 });
@@ -66,7 +66,6 @@ interface AdvancedEditorProps {
   position: Position;
   selection: Selection;
   theme: string;
-  crates: Crate[];
   focus?: Focus;
   pairCharacters: PairCharacters;
 }
@@ -130,13 +129,12 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
 
   const autocompleteProps = useMemo(() => ({
     autocompleteOnUse: props.autocompleteOnUse,
-    crates: props.crates,
-  }), [props.autocompleteOnUse, props.crates]);
+  }), [props.autocompleteOnUse]);
 
   // When the user types either `extern crate ` or `use `, automatically
   // open the autocomplete. This should help people understand that
   // there are crates available.
-  useEditorProp(editor, autocompleteProps, useCallback((editor, { autocompleteOnUse, crates }) => {
+  useEditorProp(editor, autocompleteProps, useCallback((editor, { autocompleteOnUse }) => {
     editor.commands.on('afterExec', ({ editor, command }) => {
       if (!(command.name === 'backspace' || command.name === 'insertstring')) {
         return;
@@ -147,7 +145,7 @@ const AdvancedEditor: React.SFC<AdvancedEditorProps> = props => {
       }
     });
 
-    editor.completers = [buildCrateAutocompleter(autocompleteOnUse, crates)];
+    editor.completers = [buildCrateAutocompleter(autocompleteOnUse)];
   }, []));
 
   // Both Ace and the playground want to be the One True Owner of
@@ -320,7 +318,6 @@ interface AdvancedEditorAsyncProps {
   position: Position;
   selection: Selection;
   theme: string;
-  crates: Crate[];
   focus?: Focus;
   pairCharacters: PairCharacters;
 }

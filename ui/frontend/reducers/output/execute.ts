@@ -3,7 +3,7 @@ import { finish, start } from './sharedStateManagement';
 
 const DEFAULT: State = {
   requestsInProgress: 0,
-  stdout: null,
+  body: null,
   stderr: null,
   error: null,
   isAutoBuild: false,
@@ -11,7 +11,7 @@ const DEFAULT: State = {
 
 interface State {
   requestsInProgress: number;
-  stdout?: string;
+  body?: string;
   stderr?: string;
   error?: string;
   isAutoBuild: boolean;
@@ -22,8 +22,8 @@ export default function execute(state = DEFAULT, action: Action) {
     case ActionType.ExecuteRequest:
       return start(DEFAULT, state);
     case ActionType.ExecuteSucceeded: {
-      const { stdout = '', stderr = '', isAutoBuild } = action;
-      return finish(state, { stdout, stderr, isAutoBuild });
+      const { body = '', stderr = '', isAutoBuild } = action;
+      return finish(state, { body, stderr, isAutoBuild });
     }
     case ActionType.ExecuteFailed: {
       const { error, isAutoBuild } = action;

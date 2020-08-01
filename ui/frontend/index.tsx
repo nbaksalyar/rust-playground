@@ -16,8 +16,6 @@ import {
   gotoPosition,
   selectText,
   addImport,
-  performCratesLoad,
-  performVersionsLoad,
 } from './actions';
 import { configureRustErrors } from './highlighting';
 import localStorage from './local_storage';
@@ -52,9 +50,6 @@ configureRustErrors({
   selectText: (start, end) => store.dispatch(selectText(start, end)),
   addImport: (code) => store.dispatch(addImport(code)),
 });
-
-store.dispatch(performCratesLoad());
-store.dispatch(performVersionsLoad());
 
 window.rustPlayground = {
   setCode: code => {

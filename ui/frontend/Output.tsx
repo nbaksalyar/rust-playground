@@ -6,8 +6,6 @@ import { State } from './reducers';
 import { Focus } from './types';
 
 import Execute from './Output/Execute';
-import Section from './Output/Section';
-import SimplePane, { SimplePaneProps } from './Output/SimplePane';
 import * as selectors from './selectors';
 
 const Tab: React.SFC<TabProps> = ({ kind, focus, label, onClick, tabProps }) => {

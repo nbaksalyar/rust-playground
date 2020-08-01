@@ -31,7 +31,6 @@ export interface CommonEditorProps {
   onEditCode: (_: string) => any;
   position: Position;
   selection: Selection;
-  crates: Crate[];
 }
 
 export enum Editor {

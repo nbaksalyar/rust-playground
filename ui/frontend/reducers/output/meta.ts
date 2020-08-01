@@ -20,9 +20,6 @@ export default function meta(state = DEFAULT, action: Action) {
     case ActionType.RequestFormat:
       return { ...state, focus: Focus.Format };
 
-    case ActionType.RequestGistLoad:
-      return { ...state, focus: Focus.Gist };
-
     default:
       return state;
   }
